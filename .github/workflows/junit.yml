@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - uses: renatoathaydes/setup-java-sdkman@v2.1.1
+      - uses: renatoathaydes/setup-java-sdkman@v2.1.0
         with:
           java-version: 'java 17.0.12-amzn'
           architecture: x64
