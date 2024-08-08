@@ -14,7 +14,7 @@ jobs:
       
       - uses: renatoathaydes/setup-java-sdkman@v2.1.0
         with:
-          java-version: 'java 17.0.12-amzn'
+          java-version: '17.0.12-amzn'
           architecture: x64
       - name: Install kscript
         run: |
