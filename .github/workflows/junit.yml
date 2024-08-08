@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '11'
           java-package: jdk
           architecture: x64
           distribution: 'adopt'
@@ -36,6 +36,14 @@ jobs:
 
       - name: Test with Maven
         run: mvn test -DskipTests=False --projects core
+
+      - name: Test a kscript example
+        uses: plusmobileapps/kscript-action@v1.2
+        with:
+          kts-file: 'example/kotlin/mealy.main.kts'
+          kscript-version: '3.0.2'
+          kotlin-version: '1.9.24'
+          fail-on-failure: 'true'
 
       - name: Upload the test coverage to Codecov
         uses: codecov/codecov-action@v3.1.1
