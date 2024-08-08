@@ -50,6 +50,10 @@ jobs:
 
       - name: Test a kscript example
         run: |
+          ls -al ~/.m2
+          ls -al ~/.m2/repository/
+          ls -al ~/.m2/repository/net
+          ls -al ~/.m2/repository/net/maswag/falcaun/FalCAuN-core/1.0-SNAPSHOT
           source ~/.sdkman/bin/sdkman-init.sh && kscript example/kotlin/mealy.main.kts
 
       #- name: Test a kscript example
