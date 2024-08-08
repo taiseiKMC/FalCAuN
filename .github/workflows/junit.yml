@@ -12,10 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Install Java
+      - uses: renatoathaydes/setup-java-sdkman@v2.x
+        with:
+          java-version: 'java 17.0.12-amzn'
+          architecture: x64
+      - name: Install kscript
         run: |
-          sudo apt install sdk -y
-          sdk install java 17.0.12-amzn
           sdk install kotlinc 1.9.24
           sdk install kscript 4.2.3
       
