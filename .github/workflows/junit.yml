@@ -12,14 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - uses: renatoathaydes/setup-java-sdkman@v2.1.0
+      - name: Install Java with sdkman
+        uses: sfesenko/setup-sdkman@v1
         with:
-          java-version: '17.0.12-amzn'
-          architecture: x64
-      - name: Install kscript
-        run: |
-          sdk install kotlinc 1.9.24
-          sdk install kscript 4.2.3
+          deps: java:17.0.12-amzn
+                kotlinc:1.9.24
+                kscript:4.2.3
       
       - name: Install LTSMin
         run: |
