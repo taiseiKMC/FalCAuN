@@ -23,6 +23,7 @@ jobs:
                 maven:3.9.8
       - run: |
           source ~/.sdkman/bin/sdkman-init.sh
+          export JAVA_HOME=~/.sdkman/candidates/java/17.0.12-amzn
       
       - name: Install LTSMin
         run: |
