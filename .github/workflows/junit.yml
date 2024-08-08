@@ -20,10 +20,9 @@ jobs:
           deps: java:17.0.12-amzn
                 kotlin:1.9.24
                 kscript:4.2.3
+                maven 3.9.8
       - run: |
           source ~/.sdkman/bin/sdkman-init.sh
-          sdk install maven 3.9.8
-          export JAVA_HOME=~/.sdkman/candidates/java/17.0.12-amzn
       
       - name: Install LTSMin
         run: |
@@ -31,13 +30,13 @@ jobs:
           tar xvf ltsmin-v3.1.0-linux.tgz
           sudo cp -r v3.1.0/* /usr
 
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+      #- name: Cache local Maven repository
+      #  uses: actions/cache@v3
+      #  with:
+      #    path: ~/.m2/repository
+      #    key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+      #    restore-keys: |
+      #      ${{ runner.os }}-maven-
 
       - name: Build with Maven
         run: mvn dependency:go-offline --projects core
