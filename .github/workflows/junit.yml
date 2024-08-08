@@ -19,6 +19,7 @@ jobs:
                 kotlin:1.9.24
                 kscript:4.2.3
                 maven:3.9.8
+      - run: source ~/.sdkman/bin/sdkman-init.sh
       
       - name: Install LTSMin
         run: |
