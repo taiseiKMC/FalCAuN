@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
+      - name: Remove mvn
+        run: sudo apt-get remove -y maven
       - name: Install Java with sdkman
         uses: sfesenko/setup-sdkman@v1
         with:
