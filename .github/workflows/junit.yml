@@ -41,7 +41,7 @@ jobs:
         uses: plusmobileapps/kscript-action@v1.2
         with:
           kts-file: 'example/kotlin/mealy.main.kts'
-          kscript-version: '3.0.2'
+          kscript-version: '4.2.3'
           kotlin-version: '1.9.24'
           fail-on-failure: 'true'
 
