@@ -49,7 +49,7 @@ jobs:
 
       - name: Test a kscript example
         run: |
-          kscript example/kotlin/mealy.main.kts
+          source ~/.sdkman/bin/sdkman-init.sh && kscript example/kotlin/mealy.main.kts
 
       #- name: Test a kscript example
       #  uses: plusmobileapps/kscript-action@v1.2
