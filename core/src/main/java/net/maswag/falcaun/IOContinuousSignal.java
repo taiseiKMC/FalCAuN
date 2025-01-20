@@ -44,6 +44,7 @@ public class IOContinuousSignal<I> extends AbstractIOSignal<I> {
             log.error("Inconsistent duration is detected: inputSignal.size() = " + inputSignal.size() + ", signalStep = " + signalStep + ", continuousOutputSignal.duration() = " + continuousOutputSignal.duration());
             throw new IllegalArgumentException("The duration of the continuous output signal must be consistent with the input signal");
         }
+        System.out.println("IOC: " + inputSignal.toString() + "\n" + outputSignal.toString());
         this.continuousOutputSignal = continuousOutputSignal;
         this.signalStep = signalStep;
     }
@@ -56,6 +57,7 @@ public class IOContinuousSignal<I> extends AbstractIOSignal<I> {
         if (this.continuousOutputSignal.stream(this.signalStep).anyMatch(Objects::isNull)) {
             throw new RuntimeException("The continuous output signal must not be null");
         }
+        System.out.println("IOC steam: " + inputSignal.toString() + "\n" + outputSignal.toString());
         return Streams.zip(Streams.zip(inputSignal.stream(), outputSignal.stream(), Pair::new),
                 continuousOutputSignal.stream(this.signalStep).limit(inputSignal.size()),
                 (pair, value) -> new ExtendedIOSignalPiece<>(pair.getFirst(), pair.getSecond(), value));
