@@ -13,6 +13,7 @@
     - robustness degree/estimate とか robust semantic(denotational) とか
   - STL式の充足度合いを測り, 違反する入力信号を最適化手法で探すための目的関数として使用？
 - `signal(x)` の x が指すものって結局なんだろう, 引数の n 番目で良い?
+  * もとの SUL の出力に対する index
 
 ## 名目
 - FalCAuNのソースコードの調査 : 48人時
@@ -242,6 +243,9 @@ CLI 用テスト
   - AdaptiveSTLList, StaticSTLList, StaticLTLList が継承
   - Adaptive なんちゃらが多分四十坊さんの STL 式を書き換える機能を指している
     - ということは StaticSTLList が Abstract*Adaptive*STLUpdator なのはおかしいのでは？
+
+- `ExtendedSignalMapperVisitorImpl`
+  - signal に対して四則演算や max を取る操作をした値を別の output signal に出力する mapper の実装
   
 
 #### Learnlib
