@@ -42,22 +42,22 @@ import net.automatalib.word.Word;
 
 // The following surprises the debug log
 var updaterLogger = LoggerFactory.getLogger(AbstractAdaptiveSTLUpdater::class.java) as Logger
-updaterLogger.level = Level.ALL
+updaterLogger.level = Level.INFO
 var updateListLogger = LoggerFactory.getLogger(AdaptiveSTLList::class.java) as Logger
-updateListLogger.level = Level.ALL
+updateListLogger.level = Level.INFO
 var LTSminVersionLogger = LoggerFactory.getLogger(LTSminVersion::class.java) as Logger
-LTSminVersionLogger.level = Level.ALL
+LTSminVersionLogger.level = Level.INFO
 var AbstractLTSminLogger = LoggerFactory.getLogger(AbstractLTSmin::class.java) as Logger
-AbstractLTSminLogger.level = Level.ALL
+AbstractLTSminLogger.level = Level.INFO
 var EQSearchProblemLogger = LoggerFactory.getLogger(EQSearchProblem::class.java) as Logger
-EQSearchProblemLogger.level = Level.ALL
+EQSearchProblemLogger.level = Level.INFO
 var SimulinkSteadyStateGeneticAlgorithmLogger = LoggerFactory.getLogger(EQSteadyStateGeneticAlgorithm::class.java) as Logger
-SimulinkSteadyStateGeneticAlgorithmLogger.level = Level.ALL
+SimulinkSteadyStateGeneticAlgorithmLogger.level = Level.INFO
 
 // Define the input and output mappers
-val mealSizeValues = listOf(0.0, 80.0) // <20?
+val mealSizeValues = listOf(0.0, 50.0) // <20?
 val inputMapper = InputMapperReader.make(listOf(mealSizeValues))
-val bgValues = listOf(55.0, 70.0, 400.0) // <300?
+val bgValues = listOf(55.0, 180.0, 240.0) // <300?
 val insulinValues = listOf(0.5) //listOf(0.3, 0.6) // <3?
 val outputMapperReader = OutputMapperReader(listOf(bgValues, insulinValues, bgValues))
 outputMapperReader.parse()
@@ -75,10 +75,9 @@ val stlFactory = STLFactory()
 val stlList = listOf(
     //"[] ($bg > 55)",
     //"[] ($bg > 55 && $bg < 400.0)",
-    "[] ($bg < 70.0 -> X ($max_bg > 70.0))", //下位10%以下を 30 分以上取らない
-    "! <> []_[0,5] ($max_bg < 70)", //低血糖状態が150分以上続かない
-    "($bg < 70) -> ($insulin < 0.5)", //低血糖状態で inslin を打たない
-    //"! <> X X X X X X ($bg > 240)", //高血糖状態が180分以上続かない
+    "[] ($bg < 180.0 -> X ($max_bg > 180.0))", //上位10%以上を 30 分以上取らない
+    "[] ($insulin > 0.8 -> X ($max_bg > 180.0))", //インスリンを投与してから上位10%以上を 30 分以上取らない
+    "! <> []_[0,6] ($max_bg > 240)", //高血糖状態が180分以上続かない
 ).stream().map { stlString ->
     stlFactory.parse(
         stlString,
