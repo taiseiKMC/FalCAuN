@@ -44,6 +44,7 @@ public class NumericMembershipOracle implements MembershipOracle.MealyMembership
         for (Query<String, Word<String>> q : queries) {
             final Word<String> abstractInput = q.getInput();
             WordBuilder<String> abstractOutputBuilder = new WordBuilder<>(abstractInput.size());
+            LOGGER.debug("Input {}", abstractInput.toString());
 
             if (!cache.lookup(abstractInput, abstractOutputBuilder)) {
                 abstractOutputBuilder.clear();
@@ -68,6 +69,7 @@ public class NumericMembershipOracle implements MembershipOracle.MealyMembership
             }
 
             final Word<String> output = abstractOutputBuilder.toWord().suffix(q.getSuffix().length());
+            LOGGER.debug("Output {}", abstractOutputBuilder.toString());
             q.answer(output);
         }
     }
