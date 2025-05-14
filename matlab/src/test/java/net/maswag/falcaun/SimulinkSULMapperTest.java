@@ -75,6 +75,7 @@ class NumericSULMapperTest {
 
     @BeforeEach
     void setUp() {
+        List<Character> inputLargest;
         {
             Map<Character, Double> mapper1 = new HashMap<>();
             mapper1.put('a', 10.0);
@@ -84,11 +85,12 @@ class NumericSULMapperTest {
             mapper2.put('b', 0.0);
             mapper2.put('c', 100.0);
             inputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2));
+            inputLargest = new ArrayList<>(Arrays.asList('c', 'd'));
         }
         Function<IOSignalPiece<List<Double>>, Double> diff = a -> a.getOutputSignal().get(0) - a.getOutputSignal().get(1);
         List<Function<IOSignalPiece<List<Double>>, Double>> sigMap = new ArrayList<>(Collections.singletonList(diff));
         List<Map<Character, Double>> outputMapper;
-        List<Character> largest;
+        List<Character> outputLargest;
         {
             Map<Character, Double> mapper1 = new HashMap<>();
             mapper1.put('a', 10.0);
@@ -100,8 +102,8 @@ class NumericSULMapperTest {
             Map<Character, Double> mapper3 = new HashMap<>();
             mapper3.put('n', 0.0);
             outputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2, mapper3));
-            largest = new ArrayList<>(Arrays.asList('0', '0', 'p'));
+            outputLargest = new ArrayList<>(Arrays.asList('0', '0', 'p'));
         }
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
     }
 }

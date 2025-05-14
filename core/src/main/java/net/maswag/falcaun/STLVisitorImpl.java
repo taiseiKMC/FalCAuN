@@ -22,7 +22,8 @@ import static net.maswag.falcaun.STLAbstractAtomic.Operation.*;
 public class STLVisitorImpl extends net.maswag.falcaun.STLBaseVisitor<TemporalLogic.STLCost> {
     private List<Map<Character, Double>> inputMapper;
     private List<Map<Character, Double>> outputMapper;
-    private List<Character> largest;
+    private List<Character> inputLargest;
+    private List<Character> outputLargest;
 
     private TemporalLogic.STLCost handleInterval(TemporalOp<List<Double>> subFml, net.maswag.falcaun.STLParser.IntervalContext ctx) {
         assert (ctx != null);
@@ -168,15 +169,16 @@ public class STLVisitorImpl extends net.maswag.falcaun.STLBaseVisitor<TemporalLo
         STLAbstractAtomic result;
         if (ctx.OUTPUT() != null) {
             STLOutputAtomic outputResult = new STLOutputAtomic(sigIndex, op, comparator);
-            if (this.outputMapper != null && this.largest != null) {
+            if (this.outputMapper != null && this.outputLargest != null) {
                 outputResult.setOutputMapper(outputMapper);
-                outputResult.setLargest(largest);
+                outputResult.setLargest(outputLargest);
             }
             result = outputResult;
         } else if (ctx.INPUT() != null) {
             STLInputAtomic inputResult = new STLInputAtomic(sigIndex, op, comparator);
-            if (this.inputMapper != null) {
+            if (this.inputMapper != null && this.inputLargest != null) {
                 inputResult.setInputMapper(inputMapper);
+                inputResult.setLargest(inputLargest);
             }
             result = inputResult;
         } else {

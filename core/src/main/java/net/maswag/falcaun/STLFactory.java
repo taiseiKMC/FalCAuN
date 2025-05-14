@@ -20,8 +20,9 @@ public class STLFactory {
     public TemporalLogic.STLCost parse(String stlFormula,
                                        List<Map<Character, Double>> inputMapper,
                                        List<Map<Character, Double>> outputMapper,
-                                       List<Character> largest) {
-        net.maswag.falcaun.STLVisitor<TemporalLogic.STLCost> visitor = new STLVisitorImpl(inputMapper, outputMapper, largest);
+                                       List<Character> inputLargest,
+                                       List<Character> outputLargest) {
+        net.maswag.falcaun.STLVisitor<TemporalLogic.STLCost> visitor = new STLVisitorImpl(inputMapper, outputMapper, inputLargest, outputLargest);
         return parseImpl(stlFormula, visitor);
     }
 

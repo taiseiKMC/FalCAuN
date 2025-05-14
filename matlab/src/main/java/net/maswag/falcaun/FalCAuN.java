@@ -88,25 +88,28 @@ public class FalCAuN {
         }
 
         // Parse Simulink mapper
-        List<Map<Character, Double>> inputMapper = InputMapperReader.parse(argParser.getInputMapperFile());
+        InputMapperReader inputMapperReader = new InputMapperReader(argParser.getInputMapperFile());
+        List<Map<Character, Double>> inputMapper = inputMapperReader.getInputMapper();
+        List<Character> inputLargest = inputMapperReader.getLargest();
         OutputMapperReader outputMapperReader = new OutputMapperReader(argParser.getOutputMapperFile());
         outputMapperReader.parse();
-        List<Character> largest = outputMapperReader.getLargest();
+        List<Character> outputLargest = outputMapperReader.getLargest();
         List<Map<Character, Double>> outputMapper = outputMapperReader.getOutputMapper();
         log.debug("InputMapper: {}", inputMapper);
         log.debug("OutputMapper: {}", outputMapper);
-        log.debug("Largest: {}", largest);
+        log.debug("InputMapperLargest: {}", inputLargest);
+        log.debug("OutputLargest: {}", outputLargest);
 
-        NumericSULMapper sulMapper = new NumericSULMapper(inputMapper, largest, outputMapper, argParser.getSigMap());
+        NumericSULMapper sulMapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, argParser.getSigMap());
 
         // Parse STL formulas
         List<TemporalLogic.STLCost> stl;
         STLFactory factory = new STLFactory();
         if (argParser.getStlFormula() != null) {
-            stl = Collections.singletonList(factory.parse(argParser.getStlFormula(), inputMapper, outputMapper, largest));
+            stl = Collections.singletonList(factory.parse(argParser.getStlFormula(), inputMapper, outputMapper, inputLargest, outputLargest));
         } else if (argParser.getStlFile() != null) {
             stl = Files.lines(FileSystems.getDefault().getPath(argParser.getStlFile())).map(line ->
-                    factory.parse(line, inputMapper, outputMapper, largest)).collect(Collectors.toList());
+                    factory.parse(line, inputMapper, outputMapper, inputLargest, outputLargest)).collect(Collectors.toList());
         } else {
             throw new MissingOptionException("STL formula is not given");
         }

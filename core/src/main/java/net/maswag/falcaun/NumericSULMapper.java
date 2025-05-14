@@ -35,11 +35,17 @@ public class NumericSULMapper implements SULMapper<String, String, List<Double>,
      * @param sigMap         a {@link java.util.List} object.
      */
     public NumericSULMapper(List<Map<Character, Double>> inputMapper,
-                            List<Character> largestOutputs, List<Map<Character, Double>> outputMapper,
+                            List<Map<Character, Double>> outputMapper,
+                            List<Character> largestInputs,
+                            List<Character> largestOutputs,
                             SignalMapper sigMap) {
         Map<String, List<Double>> tmpMapper = new HashMap<>();
+        var iMapper = List.copyOf(inputMapper);
+        for(int i=0; i<largestInputs.size(); i++) {
+            iMapper.get(i).put(largestInputs.get(i), iMapper.get(i).values().stream().max(Double::compareTo).orElse(0.0) + 1.0);
+        }
 
-        for (Map<Character, Double> map : inputMapper) {
+        for (Map<Character, Double> map : iMapper) {
             if (tmpMapper.isEmpty()) {
                 // When this is the first iteration, we just copy the inputMapper of the first dimension
                 for (Map.Entry<Character, Double> elem : map.entrySet()) {

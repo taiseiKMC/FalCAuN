@@ -144,10 +144,11 @@ class STLParserTest {
 
             List<Map<Character, Double>> inputMapper = Collections.emptyList();
             List<Map<Character, Double>> outputMapper = Arrays.asList(velocityMap, rotationMap, gearMap);
-            List<Character> largest = Arrays.asList('c', 'd', 'a');
+            List<Character> inputLargest = Arrays.asList();
+            List<Character> outputLargest = Arrays.asList('c', 'd', 'a');
 
             for (int i = 0; i < inputs.size(); i++) {
-                STLCost result = factory.parse(inputs.get(i), inputMapper, outputMapper, largest);
+                STLCost result = factory.parse(inputs.get(i), inputMapper, outputMapper, inputLargest, outputLargest);
                 assertTrue(result.isInitialized());
                 Assertions.assertThat(result.toAbstractString()).contains("output == ");
                 assertEquals(expectedList.get(i).toString(), result.toString());

@@ -36,7 +36,8 @@ class SimulinkSULVerifierTest {
         // Construct the mapper
         List<Map<Character, Double>> inputMapper;
         List<Map<Character, Double>> outputMapper;
-        List<Character> largest;
+        List<Character> inputLargest;
+        List<Character> outputLargest;
 
         {
             Map<Character, Double> mapper1 = new HashMap<>();
@@ -46,6 +47,7 @@ class SimulinkSULVerifierTest {
             mapper2.put('a', 0.0);
             mapper2.put('b', 9000.0);
             inputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2));
+            inputLargest = new ArrayList<>(Arrays.asList('c', 'c'));
         }
         {
             Map<Character, Double> mapper1 = new HashMap<>();
@@ -55,12 +57,12 @@ class SimulinkSULVerifierTest {
             Map<Character, Double> mapper3 = new HashMap<>();
 
             outputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2, mapper3));
-            largest = new ArrayList<>(Arrays.asList('c', '0', '0'));
+            outputLargest = new ArrayList<>(Arrays.asList('c', '0', '0'));
         }
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
         // [] (velocity < 10)
         properties = new StaticSTLList<>(Collections.singletonList(
-                factory.parse("[] (signal(0) < 10.0)", inputMapper, outputMapper, largest)));
+                factory.parse("[] (signal(0) < 10.0)", inputMapper, outputMapper, inputLargest, outputLargest)));
 
         try {
             verifier = new SimulinkSULVerifier(initScript, paramNames, signalStep, 0.0025, properties, mapper);
@@ -89,7 +91,8 @@ class SimulinkSULVerifierTest {
         // Construct the mapper
         List<Map<Character, Double>> inputMapper;
         List<Map<Character, Double>> outputMapper;
-        List<Character> largest;
+        List<Character> inputLargest;
+        List<Character> outputLargest;
 
         {
     /*
@@ -121,6 +124,7 @@ class SimulinkSULVerifierTest {
             engineSpeedMapper.put('j', 1080.0);
             engineSpeedMapper.put('k', 1100.0);
             inputMapper = new ArrayList<>(Arrays.asList(pedalAngleMapper, engineSpeedMapper));
+            inputLargest = new ArrayList<>(Arrays.asList('j', 'l'));
         }
         Function<IOSignalPiece<List<Double>>, Double> mu = a -> abs(a.getOutputSignal().get(0) -
                 a.getOutputSignal().get(1)) / a.getOutputSignal().get(1);
@@ -152,9 +156,9 @@ class SimulinkSULVerifierTest {
             muMapper.put('l', 0.16);
 
             outputMapper = new ArrayList<>(Arrays.asList(afMapper, afRefMapper, cmMapper, muMapper));
-            largest = new ArrayList<>(Arrays.asList('x', '0', '1', 'h'));
+            outputLargest = new ArrayList<>(Arrays.asList('x', '0', '1', 'h'));
         }
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
 
         try {
             verifier = new SimulinkSULVerifier(initScript, paramNames, signalStep, 0.0025, propertyZHA19_AFC1, mapper);
@@ -173,7 +177,8 @@ class SimulinkSULVerifierTest {
         // Construct the mapper
         List<Map<Character, Double>> inputMapper;
         List<Map<Character, Double>> outputMapper;
-        List<Character> largest;
+        List<Character> inputLargest;
+        List<Character> outputLargest;
 
         {
     /*
@@ -205,6 +210,7 @@ class SimulinkSULVerifierTest {
             engineSpeedMapper.put('j', 1080.0);
             engineSpeedMapper.put('k', 1100.0);
             inputMapper = new ArrayList<>(Arrays.asList(pedalAngleMapper, engineSpeedMapper));
+            inputLargest = new ArrayList<>(Arrays.asList('j', 'l'));
         }
         Function<IOSignalPiece<List<Double>>, Double> mu =
                 a -> abs(a.getOutputSignal().get(0) - a.getOutputSignal().get(1)) / a.getOutputSignal().get(1);
@@ -236,9 +242,9 @@ class SimulinkSULVerifierTest {
             muMapper.put('l', 0.16);
 
             outputMapper = new ArrayList<>(Arrays.asList(afMapper, afRefMapper, cmMapper, muMapper));
-            largest = new ArrayList<>(Arrays.asList('x', '0', '1', 'h'));
+            outputLargest = new ArrayList<>(Arrays.asList('x', '0', '1', 'h'));
         }
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
 
         try {
             verifier = new SimulinkSULVerifier(initScript, paramNames, signalStep, 0.0025, propertyZHA19_AFC1, mapper);
@@ -271,7 +277,8 @@ class SimulinkSULVerifierTest {
     class AutoTransTest {
         List<Map<Character, Double>> inputMapper;
         List<Map<Character, Double>> outputMapper;
-        List<Character> largest;
+        List<Character> inputLargest;
+        List<Character> outputLargest;
 
         @BeforeEach
         void setUp() {
@@ -287,6 +294,7 @@ class SimulinkSULVerifierTest {
                 mapper2.put('a', 0.0);
                 mapper2.put('b', 325.0);
                 inputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2));
+                inputLargest = new ArrayList<>(Arrays.asList('c', 'c'));
             }
             {
                 Map<Character, Double> mapper1 = new HashMap<>();
@@ -296,16 +304,16 @@ class SimulinkSULVerifierTest {
                 Map<Character, Double> mapper3 = new HashMap<>();
 
                 outputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2, mapper3));
-                largest = new ArrayList<>(Arrays.asList('b', 'b', 'a'));
+                outputLargest = new ArrayList<>(Arrays.asList('b', 'b', 'a'));
             }
-            mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+            mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
         }
 
         @Test
         void setTimeout() throws Exception {
             // generate properties
             String stlString = "alw_[0, 3] (signal(1) < 4750)";
-            TemporalLogic.STLCost stl = factory.parse(stlString, inputMapper, outputMapper, largest);
+            TemporalLogic.STLCost stl = factory.parse(stlString, inputMapper, outputMapper, inputLargest, outputLargest);
             properties = new StaticSTLList<>(Collections.singletonList(stl));
             // define the verifier
             verifier = new SimulinkSULVerifier(initScript, paramNames, signalStep, 0.0025, properties, mapper);
@@ -328,7 +336,7 @@ class SimulinkSULVerifierTest {
             @BeforeEach
             void setUp() {
                 String stlString = "alw_[0, 20] (signal(0) < 120)";
-                stl = factory.parse(stlString, inputMapper, outputMapper, largest);
+                stl = factory.parse(stlString, inputMapper, outputMapper, inputLargest, outputLargest);
             }
 
             @Test
@@ -365,7 +373,7 @@ class SimulinkSULVerifierTest {
                         "alw_[0, 20] (signal(0) < 120)",
                         "alw_[0, 10] (signal(1) < 4750)");
                 stlList = stlStringList.stream().map(stlString ->
-                        factory.parse(stlString, inputMapper, outputMapper, largest)).collect(Collectors.toList());
+                        factory.parse(stlString, inputMapper, outputMapper, inputLargest, outputLargest)).collect(Collectors.toList());
                 expectedStlStringList = stlList.stream().map(Object::toString).collect(Collectors.toList());
             }
 

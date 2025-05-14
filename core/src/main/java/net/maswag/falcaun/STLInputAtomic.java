@@ -10,7 +10,7 @@ import java.util.*;
 public class STLInputAtomic extends STLAbstractAtomic {
     private final List<List<Character>> abstractInputs = new ArrayList<>();
     private final List<List<Double>> concreteInputs = new ArrayList<>();
-    private final List<Character> largest = Collections.emptyList();
+    private List<Character> largest = Collections.emptyList();
     private List<Map<Character, Double>> inputMapper;
 
     /**
@@ -46,6 +46,11 @@ public class STLInputAtomic extends STLAbstractAtomic {
 
     void setInputMapper(List<Map<Character, Double>> inputMapper) {
         this.inputMapper = inputMapper;
+        setInputMaps();
+    }
+
+    void setLargest(List<Character> largest) {
+        this.largest = largest;
         setInputMaps();
     }
 

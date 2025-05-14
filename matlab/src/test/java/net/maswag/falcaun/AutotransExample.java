@@ -25,8 +25,9 @@ public class AutotransExample {
     @Getter
     private List<Map<Character, Double>> inputMapper;
     private List<Map<Character, Double>> outputMapper;
+    private List<Character> inputLargest;
     @Getter
-    private List<Character> largest;
+    private List<Character> outputLargest;
     private NumericSULVerifier verifier;
     @Getter
     private AdaptiveSTLUpdater<List<Double>> properties;
@@ -59,6 +60,7 @@ public class AutotransExample {
             brakeMapper.put('h', 325.0);
 
             inputMapper = new ArrayList<>(Arrays.asList(throttleMapper, brakeMapper));
+            inputLargest = new ArrayList<>(Arrays.asList('X'));
         }
         {
             //{120, 160, 170, 200}.
@@ -90,9 +92,9 @@ public class AutotransExample {
 
 
             outputMapper = new ArrayList<>(Arrays.asList(velocityMapper, rotationMapper, gearMapper));
-            largest = new ArrayList<>(Arrays.asList('X', 'X', 'X'));
+            outputLargest = new ArrayList<>(Arrays.asList('X', 'X', 'X'));
         }
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
         setOutputMaps();
     }
 
@@ -110,7 +112,7 @@ public class AutotransExample {
 
     void setInputMapper(List<Map<Character, Double>> inputMapper) {
         this.inputMapper = inputMapper;
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
     }
 
     List<Map<Character, Double>> getOutputMapper() {
@@ -119,13 +121,13 @@ public class AutotransExample {
 
     void setOutputMapper(List<Map<Character, Double>> outputMapper) {
         this.outputMapper = outputMapper;
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
         setOutputMaps();
     }
 
     void setLargest(List<Character> largest) {
-        this.largest = largest;
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        this.outputLargest = largest;
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
         setOutputMaps();
     }
 
@@ -143,7 +145,7 @@ public class AutotransExample {
 
     public void setSigMap(List<Function<IOSignalPiece<List<Double>>, Double>> sigMap) {
         this.sigMap = sigMap;
-        mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(this.sigMap));
+        mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(this.sigMap));
     }
 
     private List<Character> constructSmallerAPs(int index, double threshold) {
@@ -151,7 +153,7 @@ public class AutotransExample {
         int thresholdIndex = (bsResult >= 0) ? bsResult : (~bsResult - 1);
         ArrayList<Character> resultAPs = new ArrayList<>(abstractOutputs.get(index).subList(0, thresholdIndex + 1));
         if (bsResult < 0 && thresholdIndex == abstractOutputs.size() - 1) {
-            resultAPs.add(largest.get(index));
+            resultAPs.add(outputLargest.get(index));
         }
 
         return resultAPs;
@@ -162,7 +164,7 @@ public class AutotransExample {
         int thresholdIndex = (bsResult >= 0) ? bsResult : (~bsResult - 1);
         ArrayList<Character> resultAPs = new ArrayList<>(abstractOutputs.get(index).subList(thresholdIndex + 1, abstractOutputs.get(index).size()));
 
-        resultAPs.add(largest.get(index));
+        resultAPs.add(outputLargest.get(index));
 
 
         return resultAPs;
@@ -177,7 +179,7 @@ public class AutotransExample {
         }
         if (abstractOutputs.get(index).isEmpty() ||
                 (bsResult < 0 && thresholdIndex == abstractOutputs.size() - 1)) {
-            resultAPs.add(largest.get(index));
+            resultAPs.add(outputLargest.get(index));
         }
         assert resultAPs.size() == 1;
 
@@ -186,7 +188,7 @@ public class AutotransExample {
 
     private List<Character> constructAllAPs(int index) {
         ArrayList<Character> resultAPs = new ArrayList<>(abstractOutputs.get(index));
-        resultAPs.add(largest.get(index));
+        resultAPs.add(outputLargest.get(index));
         return resultAPs;
     }
 

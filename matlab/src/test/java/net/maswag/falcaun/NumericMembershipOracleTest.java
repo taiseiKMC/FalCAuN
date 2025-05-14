@@ -42,7 +42,8 @@ class NumericMembershipOracleTest {
         // Construct the mapper
         List<Map<Character, Double>> inputMapper;
         List<Map<Character, Double>> outputMapper;
-        List<Character> largest;
+        List<Character> inputLargest;
+        List<Character> outputLargest;
 
         {
             Map<Character, Double> mapper1 = new HashMap<>();
@@ -52,6 +53,7 @@ class NumericMembershipOracleTest {
             mapper2.put('a', 0.0);
             mapper2.put('b', 9000.0);
             inputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2));
+            inputLargest = new ArrayList<>(Arrays.asList('c', 'c'));
         }
         {
             Map<Character, Double> mapper1 = new HashMap<>();
@@ -61,9 +63,9 @@ class NumericMembershipOracleTest {
             Map<Character, Double> mapper3 = new HashMap<>();
 
             outputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2, mapper3));
-            largest = new ArrayList<>(Arrays.asList('c', '0', '0'));
+            outputLargest = new ArrayList<>(Arrays.asList('c', '0', '0'));
         }
-        this.mapper = new NumericSULMapper(inputMapper, largest, outputMapper, new SimpleSignalMapper(sigMap));
+        this.mapper = new NumericSULMapper(inputMapper, outputMapper, inputLargest, outputLargest, new SimpleSignalMapper(sigMap));
         this.simulink = new SimulinkSUL(initScript, paramNames, signalStep, 0.0025);
         this.concreteInputAlphabet = mapper.constructConcreteAlphabet();
         this.abstractInputAlphabet = mapper.constructAbstractAlphabet();

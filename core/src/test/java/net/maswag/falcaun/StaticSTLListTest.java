@@ -19,7 +19,8 @@ class StaticSTLListTest {
     class AutoTransTest {
         List<Map<Character, Double>> inputMapper;
         List<Map<Character, Double>> outputMapper;
-        List<Character> largest;
+        List<Character> inputLargest;
+        List<Character> outputLargest;
 
         @BeforeEach
         void setUp() {
@@ -32,6 +33,7 @@ class StaticSTLListTest {
                 mapper2.put('a', 0.0);
                 mapper2.put('b', 325.0);
                 inputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2));
+                inputLargest = new ArrayList<>(Arrays.asList('c', 'c'));
             }
             {
                 Map<Character, Double> mapper1 = new HashMap<>();
@@ -41,7 +43,7 @@ class StaticSTLListTest {
                 Map<Character, Double> mapper3 = new HashMap<>();
 
                 outputMapper = new ArrayList<>(Arrays.asList(mapper1, mapper2, mapper3));
-                largest = new ArrayList<>(Arrays.asList('b', 'b', 'a'));
+                outputLargest = new ArrayList<>(Arrays.asList('b', 'b', 'a'));
             }
         }
 
@@ -58,7 +60,7 @@ class StaticSTLListTest {
                         "alw_[0, 20] (signal(0) < 120)",
                         "alw_[0, 10] (signal(1) < 4750)");
                 stlList = stlStringList.stream().map(stlString ->
-                        factory.parse(stlString, inputMapper, outputMapper, largest)).collect(Collectors.toList());
+                        factory.parse(stlString, inputMapper, outputMapper, inputLargest, outputLargest)).collect(Collectors.toList());
                 expectedStlStringList = stlList.stream().map(Object::toString).collect(Collectors.toList());
                 properties = new StaticSTLList<>(stlList);
             }

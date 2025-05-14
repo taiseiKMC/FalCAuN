@@ -12,7 +12,7 @@ class InputMapperReaderTest {
     @Test
     void parse() throws IOException {
         String path = "../example/AT.imap.tsv";
-        List<Map<Character, Double>> result = InputMapperReader.parse(path);
+        List<Map<Character, Double>> result = new InputMapperReader(path).getInputMapper();
         Map<Character, Double> mapper1 = new HashMap<>();
         mapper1.put('a', 0.0);
         mapper1.put('b', 100.0);

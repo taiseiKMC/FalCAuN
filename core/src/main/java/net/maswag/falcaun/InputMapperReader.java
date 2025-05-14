@@ -1,20 +1,38 @@
 package net.maswag.falcaun;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.primitives.Chars;
+
+import lombok.Getter;
+
 public class InputMapperReader extends AbstractMapperReader {
-    static List<Map<Character, Double>> parse(String filename) throws IOException {
+    @Getter
+    private List<Character> largest;
+    @Getter
+    private List<Map<Character, Double>> inputMapper;
+
+    public InputMapperReader(String filename) throws IOException {
         List<List<Double>> parsedData = rawParse(filename);
-        return InputMapperReader.make(parsedData);
+        parse(parsedData);
     }
 
-    public static List<Map<Character, Double>> make(List<List<Double>> data) {
-        char[] charList = new char[data.size()];
+    /**
+     * <p>Constructor for OutputMapperReader from data.</p>
+     */
+    public InputMapperReader(List<List<Double>> data) throws IOException {
+        parse(data);
+    }
+
+    void parse(List<List<Double>> parsedData) throws IOException {
+        char[] charList = new char[parsedData.size()];
         Arrays.fill(charList, 'a');
 
-        return assignCharacters(data, charList);
+        inputMapper = assignCharacters(parsedData, charList);
+        largest = new ArrayList<>(Chars.asList(charList));
     }
 }
