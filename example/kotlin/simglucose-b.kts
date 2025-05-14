@@ -57,14 +57,14 @@ SimulinkSteadyStateGeneticAlgorithmLogger.level = Level.INFO
 // Define the input and output mappers
 val ignoreValues = listOf(null)
 val mealSizeValues = listOf(0.0, 50.0) // <20?
-val inputMapper = InputMapperReader.make(listOf(mealSizeValues))
+val inputMapperReader = InputMapperReader(listOf(mealSizeValues))
 val bgValues = listOf(55.0, 180.0, 240.0) // <300?
 val insulinValues = listOf(0.5) //listOf(0.3, 0.6) // <3?
 val outputMapperReader = OutputMapperReader(listOf(bgValues, insulinValues, bgValues, ignoreValues, ignoreValues, ignoreValues))
 outputMapperReader.parse()
 val signalMapper = ExtendedSignalMapper()
 val mapper =
-    NumericSULMapper(inputMapper, outputMapperReader.largest, outputMapperReader.outputMapper, signalMapper)
+    NumericSULMapper(inputMapperReader.inputMapper, outputMapperReader.outputMapper, inputMapperReader.largest, outputMapperReader.largest, signalMapper)
 
 val bg = "signal(0)"
 val insulin = "signal(1)"
@@ -82,8 +82,9 @@ val stlList = listOf(
 ).stream().map { stlString ->
     stlFactory.parse(
         stlString,
-        inputMapper,
+        inputMapperReader.inputMapper,
         outputMapperReader.outputMapper,
+        inputMapperReader.largest,
         outputMapperReader.largest
     )
 }.toList()
