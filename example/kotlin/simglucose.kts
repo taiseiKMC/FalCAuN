@@ -57,7 +57,7 @@ SimulinkSteadyStateGeneticAlgorithmLogger.level = Level.ALL
 // Define the input and output mappers
 val ignoreValues = listOf(null)
 val mealSizeValues = listOf(0.0, 50.0) // <20?
-val inputMapper = InputMapperReader.make(listOf(mealSizeValues))
+val inputMapperReader = InputMapperReader(listOf(mealSizeValues))
 val bgValues = listOf(90.0) // <300?
 val insulinValues = listOf(0.5) //listOf(0.3, 0.6) // <3?
 val deltaBgValues = listOf(-5.0, 3.0)
@@ -65,7 +65,7 @@ val outputMapperReader = OutputMapperReader(listOf(bgValues, ignoreValues, ignor
 outputMapperReader.parse()
 val signalMapper = ExtendedSignalMapper()
 val mapper =
-    NumericSULMapper(inputMapper, outputMapperReader.largest, outputMapperReader.outputMapper, signalMapper)
+    NumericSULMapper(inputMapperReader.inputMapper, outputMapperReader.outputMapper, inputMapperReader.largest, outputMapperReader.largest, signalMapper)
 
 val bg = "signal(0)"
 val insulin = "signal(1)"
@@ -79,13 +79,15 @@ val alpha = 10 //30mins * alpha tick
 val stlFactory = STLFactory()
 val stlList = listOf(
     //"[] ($bg > 55.0 && $bg < 240.0)",
-    "([] (input(0) >= 50 -> X (input(0) < 50))) -> [] ($bg > 90.0 -> (input(0) == 50.0 -> $insulin > 0.5))", //BG が低くなければ、食事にinsulin投与が伴う
-    "([] (input(0) >= 50 -> X (input(0) < 50))) -> [] ($min_delta_bg > -5.0 && $max_delta_bg < 3.0)" // BG の変化量は -5 以上 3 未満に収まっている
+    "(input(0) > 0.0 && X (input(0) > 0.0)) R ($bg > 90.0 -> (input(0) == 50.0 -> $insulin > 0.5))", //BG が低くなければ、食事にinsulin投与が伴う
+    "(input(0) > 0.0 && X (input(0) > 0.0)) R ($min_delta_bg > -5.0 && $max_delta_bg < 3.0)" // BG の変化量は -5 以上 3 未満に収まっている
+    //"(input(0) == 50.0 && X (input(0) == 50.0)) R ($min_delta_bg > -5.0 && $max_delta_bg < 3.0)" // BG の変化量は -5 以上 3 未満に収まっている
 ).stream().map { stlString ->
     stlFactory.parse(
         stlString,
-        inputMapper,
+        inputMapperReader.inputMapper,
         outputMapperReader.outputMapper,
+        inputMapperReader.largest,
         outputMapperReader.largest
     )
 }.toList()
