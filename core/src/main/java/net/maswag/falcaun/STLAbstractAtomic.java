@@ -150,7 +150,7 @@ abstract public class STLAbstractAtomic extends AbstractTemporalLogic<List<Doubl
         int bsResult = Collections.binarySearch(concreteValues.get(index), threshold);
         int thresholdIndex = (bsResult >= 0) ? bsResult : (~bsResult - 1);
         Set<Character> resultAPs = new HashSet<>(abstractValues.get(index).subList(0, thresholdIndex + 1));
-        if (bsResult < 0 && thresholdIndex == abstractValues.size() - 1) {
+        if (!largest.isEmpty() && bsResult < 0 && thresholdIndex == abstractValues.get(index).size() - 1) {
             resultAPs.add(largest.get(index));
         }
 
@@ -168,8 +168,9 @@ abstract public class STLAbstractAtomic extends AbstractTemporalLogic<List<Doubl
         int thresholdIndex = (bsResult >= 0) ? bsResult : (~bsResult - 1);
         Set<Character> resultAPs = new HashSet<>(abstractValues.get(index).subList(thresholdIndex + 1, abstractValues.get(index).size()));
 
-        resultAPs.add(largest.get(index));
-
+        if (!largest.isEmpty()) {// If the signal is output signal
+            resultAPs.add(largest.get(index));
+        }
 
         return resultAPs;
     }
@@ -187,8 +188,8 @@ abstract public class STLAbstractAtomic extends AbstractTemporalLogic<List<Doubl
         if (!abstractValues.get(index).isEmpty()) {
             resultAPs.addAll(abstractValues.get(index).subList(thresholdIndex, thresholdIndex + 1));
         }
-        if (abstractValues.get(index).isEmpty() ||
-                (bsResult < 0 && thresholdIndex == abstractValues.size() - 1)) {
+        if (!largest.isEmpty() && (abstractValues.get(index).isEmpty()
+            || (bsResult < 0 && thresholdIndex == abstractValues.get(index).size() - 1))) {
             resultAPs.add(largest.get(index));
         }
         assert resultAPs.size() == 1;
