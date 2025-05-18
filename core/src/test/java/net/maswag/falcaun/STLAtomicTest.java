@@ -5,6 +5,8 @@ import net.automatalib.word.WordBuilder;
 import net.maswag.falcaun.TemporalLogic.STLCost;
 import org.junit.jupiter.api.Test;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
@@ -12,6 +14,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 class STLAtomicTest {
 
     @Test
