@@ -141,10 +141,11 @@ class SUL(SULBase):
         super().__init__(start_time, step_n, "./results")
 
 
-if __name__ == "__main__":
+# Below part is executed even if PythonModel calls this file
+#if __name__ == "__main__":
     #BG が範囲内にあるか？を仕様で書く
-    sul = SUL()
-    sul.pre()
-    for i in range(0, 60*24//3):
-        sul.step([numpy.random.exponential(1)])
-    sul.post()
+    #sul = SUL()
+    #sul.pre()
+    #for i in range(0, 60*24//3):
+    #    sul.step([numpy.random.exponential(1)])
+    #sul.post()
