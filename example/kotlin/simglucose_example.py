@@ -14,6 +14,7 @@ from simglucose.actuator.pump import InsulinPump
 from simglucose.patient.t1dpatient import T1DPatient
 
 
+# A scenario that implements set_action, a method to change the meal input dynamically.
 class ContinuousGlucoseScenario(Scenario):
     def __init__(self, start_time):
         Scenario.__init__(self, start_time=start_time)
@@ -29,7 +30,7 @@ class ContinuousGlucoseScenario(Scenario):
 
 INF=1e9
 
-# Unfold SimObj
+# A class for SUL based on SimObj
 class SULBase:
     fixed_env : any
     controller : Controller
@@ -85,6 +86,8 @@ class SULBase:
         (min_bg, min_delta_bg) = (INF, INF)
         for i in range(self.step_n):
             (bg, insulin) = self.mini_step()
+
+            # Calculate statistics, used as the return values
             last_bg = bg
             sum_insulin += insulin
             max_bg = max(max_bg, bg)
@@ -117,7 +120,11 @@ class SULBase:
         #self.so.save_results()
         #return self.so.results()
         return 0
-    
+
+    def close(self) -> None:
+        return 0
+
+
     def results(self):
         return self.env.show_history()
 
@@ -128,9 +135,7 @@ class SULBase:
         filename = os.path.join(self.result_path, str(self.env.patient.name) + '.csv')
         df.to_csv(filename)
         print("Saved output to {}".format(filename))
-    
-    def close(self) -> None:
-        return 0
+
 
 class SUL(SULBase):
     def __init__(self):
