@@ -59,7 +59,7 @@ val stlList = listOf(
     //"[] ($bg > 55.0 && $bg < 240.0)",
     "($bg > 90.0 -> (input(0) > 0 -> $insulin > 0.5))", //BG が低くなければ、食事にinsulin投与が伴う
     "((input(0) > 0.0 && X (input(0) > 0.0))) R ($min_delta_bg > -5.0 && $max_delta_bg < 3.0)", // BG の変化量は -5 以上 3 未満に収まっている
-    "(! (input(0) < 50.0 || X (input(0) < 50.0))) R ($min_delta_bg > -5.0 && $max_delta_bg < 3.0)"
+    "(! ((input(0) < 50.0 && input(0) != 50.0) || X (input(0) < 50.0 && input(0) != 50.0))) R ($min_delta_bg > -5.0 && $max_delta_bg < 3.0)"
 ).stream().map { stlString ->
     stlFactory.parse(
         stlString,
