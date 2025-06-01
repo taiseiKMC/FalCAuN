@@ -10,14 +10,18 @@ import java.io.Closeable;
 import java.util.concurrent.ExecutionException;
 
 /**
- * The System Under Learning implemented by a Simulink. We use the fixed step
- * execution of Simulink to make sampling easier.
+ * The System Under Learning implemented by a Python model.
  */
 @Slf4j
 public class PythonSUL<I, O> implements SUL<I, O>, Closeable {
     protected final PythonModel<I, O> model;
     protected final TimeMeasure simulationTime = new TimeMeasure();
 
+    /**
+     * @param initScript The Python script to initialize the model.
+     *                   It defines a class SUL with methods pre(), post(), step(I inputSignal) -> O, and close().
+     * @param outputClass The class object of the output signal produced by the step method.
+     */
     public PythonSUL(String initScript, Class<O> outputClass) throws InterruptedException, ExecutionException {
         this.model = new PythonModel<I, O>(initScript, outputClass);
     }
@@ -73,8 +77,7 @@ public class PythonSUL<I, O> implements SUL<I, O>, Closeable {
     }
 
     /**
-     * Close the MATLAB engine. This method must be called when the object is no
-     * longer used.
+     * {@inheritDoc}
      */
     @Override
     public void close() {
