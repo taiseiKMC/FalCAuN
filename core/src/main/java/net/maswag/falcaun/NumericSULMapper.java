@@ -69,6 +69,7 @@ public class NumericSULMapper implements SULMapper<String, String, List<Double>,
             ArrayList<Character> cList = new ArrayList<>(entry.keySet());
             ArrayList<Double> dList = new ArrayList<>(entry.values());
             assert cList.size() == dList.size();
+            // dList の大小順で cList をソートしないといけない気がする
             abstractOutputs.add(cList);
             concreteOutputs.add(dList);
         }
