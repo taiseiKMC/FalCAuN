@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Callable
 #from java.util import ArrayList
 import matlab.engine
 import matlab
@@ -7,6 +7,10 @@ import numpy as np
 signalStep=0.00025
 
 class Signal:
+    """
+    Equivalent to Signal
+    """
+
     timestamps : List[float]
     signalValue : List[List[float]]
     timeStep : float
@@ -39,18 +43,30 @@ class Signal:
 
 
 
-class SimulinkSUL:
+class SimulinkModel:
+    """
+    Compatible implementation of SimulinkModel
+    """
+
+    mdl : str
     paramNames : List[str]
-    inputSignal : Signal
     signalStep : float
     simulinkSimulationStep : float
+    inputSignal : Signal
 
     eng : matlab.engine.MatlabEngine
     isInitial : bool
     counter : int
     useFastRestart = True
-    mdl : str
-    def __init__(self, paramNames, signalStep, simulinkSimulationStep):
+    def __init__(
+        self,
+        initScript: Callable[[matlab.engine.MatlabEngine], None],
+        mdl: str,
+        paramNames: List[str],
+        signalStep: float,
+        simulinkSimulationStep: float
+    ) -> None:
+        self.mdl = mdl
         self.paramNames = paramNames
         self.signalStep = signalStep
         self.simulinkSimulationStep = simulinkSimulationStep
@@ -62,14 +78,9 @@ class SimulinkSUL:
         self.eng.clear(nargout=0)
         self.eng.warning('off', 'Simulink:LoadSave:EncodingMismatch')
         self.eng.workspace["signalStep"] = signalStep
-        versionString = self.eng.version('-release')
-        oldpath = self.eng.path()
-        userpath = self.eng.userpath()
-        arg0 = userpath + "/Examples/" + versionString + "/simulink_automotive/ModelingAnAutomaticTransmissionControllerExample/"
-        self.eng.path(arg0, oldpath)
 
-        self.mdl = "Autotrans_shift"
-        self.eng.load_system(self.mdl, nargout=0)
+        initScript(self.eng)
+
         self.reset()
 
     def step(self, inputSignal : List[float]) -> List[List[float]]:
@@ -238,30 +249,48 @@ class SimulinkSUL:
             return [0.0]
         else:
             return self.eng.workspace["t"]
-        
 
 class SUL:
-    simulinkSUL : SimulinkSUL
+    """
+    Python wrapped SUL using the Autotrans_shift Simulink model
+    """
+
+    simulinkModel : SimulinkModel
+    MDL = "Autotrans_shift"
+
+    def initScript(eng : matlab.engine.MatlabEngine) -> None:
+        """
+        Compatible to `initScript` in AutoTrans.kt
+        """
+
+        versionString = eng.version('-release')
+        oldpath = eng.path()
+        userpath = eng.userpath()
+        arg0 = userpath + "/Examples/" + versionString + "/simulink_automotive/ModelingAnAutomaticTransmissionControllerExample/"
+        eng.path(arg0, oldpath)
+
+        eng.load_system(SUL.MDL, nargout=0)
+
     def __init__(self):
         paramNames = ["throttle", "brake"]
         signalStep = 1.0
         simulinkSimulationStep = 0.0025
-        self.simulinkSUL = SimulinkSUL(paramNames, signalStep, simulinkSimulationStep)
+        self.simulinkModel = SimulinkModel(SUL.initScript, SUL.MDL, paramNames, signalStep, simulinkSimulationStep)
 
     def step(self, inputSignal : List[float]) -> List[float]:
-        ret = self.simulinkSUL.step(inputSignal)
+        ret = self.simulinkModel.step(inputSignal)
         tmp = np.array(ret[0]) if len(ret) == 1 else np.array(ret)
         ret = [float(e) for e in tmp[-1]]
         return ret
     
     def pre(self) -> None:
-        self.simulinkSUL.reset()
+        self.simulinkModel.reset()
 
     def post(self) -> None:
-        self.simulinkSUL.reset()
+        self.simulinkModel.reset()
 
     def close(self) -> None:
-        self.simulinkSUL.close()
+        self.simulinkModel.close()
 
 #if __name__ == "__main__":
 #    sul = SUL()
