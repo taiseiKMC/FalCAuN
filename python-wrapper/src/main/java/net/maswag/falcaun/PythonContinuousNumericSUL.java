@@ -157,12 +157,20 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
         @SuppressWarnings("rawtypes")
         NDArray ret = null;
 
-        for (var e : inputSignal) {
-            this.inputSignal.add(e);
+        if(this.model.hasExec()) {
+            this.inputSignal.addAll(inputSignal);
 
             simulationTime.start();
-            ret = this.model.step(e);
+            ret = this.model.exec(inputSignal.asList());
             simulationTime.stop();
+        } else {
+            for (var e : inputSignal) {
+                this.inputSignal.add(e);
+
+                simulationTime.start();
+                ret = this.model.step(e);
+                simulationTime.stop();
+            }
         }
 
         var values = constructValueWithTime(ret);
