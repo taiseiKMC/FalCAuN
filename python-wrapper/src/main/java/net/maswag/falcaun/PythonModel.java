@@ -7,8 +7,6 @@ import jep.python.PyCallable;
 import jep.python.PyObject;
 import lombok.extern.slf4j.Slf4j;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * A PythonModel class wraps a model implemented by python.
  * The model is expected to have methods pre(), post(), step(I inputSignal) -> O, and close().

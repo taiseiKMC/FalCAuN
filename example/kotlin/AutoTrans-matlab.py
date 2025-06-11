@@ -1,4 +1,4 @@
-from typing import List, Callable
+from typing import List, Callable, Tuple
 #from java.util import ArrayList
 import matlab.engine
 import matlab
@@ -83,8 +83,8 @@ class SimulinkModel:
 
         self.reset()
 
-    def step(self, inputSignal : List[float]) -> List[List[float]]:
-        assert (self.isInitial or not inputSignal.isEmpty())
+    def step(self, inputSignal : List[float]) -> Tuple[List[float], List[List[float]]]:
+        assert (self.isInitial or not inputSignal == [])
 
 
         self.inputSignal.add(inputSignal)
@@ -116,7 +116,7 @@ class SimulinkModel:
         # Final internal process
         assert not self.isInitial
 
-        return y
+        return (t, y)
 
     def reset(self) -> None:
         self.inputSignal = Signal(self.signalStep)
@@ -277,10 +277,22 @@ class SUL:
         simulinkSimulationStep = 0.0025
         self.simulinkModel = SimulinkModel(SUL.initScript, SUL.MDL, paramNames, signalStep, simulinkSimulationStep)
 
-    def step(self, inputSignal : List[float]) -> List[float]:
-        ret = self.simulinkModel.step(inputSignal)
-        tmp = np.array(ret[0]) if len(ret) == 1 else np.array(ret)
-        ret = [float(e) for e in tmp[-1]]
+    def step(self, inputSignal : List[float]) -> np.ndarray:
+        """
+        Returns an numpy array 'ary' : ary[i][0] is the time, and ary[i][1:] is the output signal.
+        """
+
+        (t, y) = self.simulinkModel.step(inputSignal)
+        y = np.array(y[0], dtype=np.float64)
+        t = np.array(t, dtype=np.float64)
+
+        # Convert the result to numpy array
+        ary = []
+        for i in range(len(y)):
+            a = np.insert(y[i], 0, t[i])
+            ary.append(list(a))
+
+        ret = np.array(ary, dtype=np.float64)
         return ret
     
     def pre(self) -> None:
