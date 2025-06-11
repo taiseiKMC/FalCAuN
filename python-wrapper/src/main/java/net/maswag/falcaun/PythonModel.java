@@ -7,6 +7,9 @@ import jep.python.PyCallable;
 import jep.python.PyObject;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+import java.util.List;
+
 /**
  * A PythonModel class wraps a model implemented by python.
  * The model is expected to have methods pre(), post(), step(I inputSignal) -> O, and close().
@@ -33,6 +36,7 @@ public class PythonModel<I, O> {
     private final String initScript;
 
     private PyCallable pyPre, pyPost, pyStep, pyClose;
+    private Optional<PyCallable> pyExec = Optional.empty();
 
     /**
      * Constructs a Python interpreter with the given initialization script as a Python model.
@@ -67,6 +71,14 @@ public class PythonModel<I, O> {
             this.pyPost = pysul.getAttr("post", PyCallable.class);
             this.pyStep = pysul.getAttr("step", PyCallable.class);
             this.pyClose = pysul.getAttr("close", PyCallable.class);
+
+            Object hasExecObj = interp.getValue("hasattr(sul, 'exec')");
+            // If 'sul' has 'exec' method, bind it to pyExec
+            if (hasExecObj instanceof Boolean hasExec && hasExec) {
+                this.pyExec = Optional.of(pysul.getAttr("exec", PyCallable.class));
+            } else {
+                this.pyExec = Optional.empty();
+            }
         }
         this.initialized.set(true);
     }
@@ -91,5 +103,14 @@ public class PythonModel<I, O> {
 
     public void close() {
         this.pyClose.call();
+    }
+
+    public boolean hasExec() {
+        return this.pyExec.isPresent();
+    }
+
+    @SuppressWarnings("rawtypes")
+    public List exec(List<I> inputSignals) {
+        return this.pyExec.orElseThrow().callAs(List.class, inputSignals);
     }
 }

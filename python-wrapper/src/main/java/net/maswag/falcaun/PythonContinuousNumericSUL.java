@@ -154,12 +154,22 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
         @SuppressWarnings("rawtypes")
         List ret = null;
 
-        for (var e : inputSignal) {
-            this.inputSignal.add(e);
+        // Use exec() if it is available in the model for batch processing.
+        // Otherwise, use step() for each input signal.
+        if(this.model.hasExec()) {
+            this.inputSignal.addAll(inputSignal);
 
             simulationTime.start();
-            ret = this.model.step(e);
+            ret = this.model.exec(inputSignal.asList());
             simulationTime.stop();
+        } else {
+            for (var e : inputSignal) {
+                this.inputSignal.add(e);
+
+                simulationTime.start();
+                ret = this.model.step(e);
+                simulationTime.stop();
+            }
         }
 
         var values = constructValueWithTime(ret);

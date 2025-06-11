@@ -85,9 +85,18 @@ class SimulinkModel:
 
     def step(self, inputSignal : List[float]) -> Tuple[List[float], List[List[float]]]:
         assert (self.isInitial or not inputSignal == [])
-
-
         self.inputSignal.add(inputSignal)
+        return self.exec_aux()
+
+    def exec(self, inputSignals: List[List[float]]) -> Tuple[List[float], List[List[float]]]:
+        assert (self.isInitial or not inputSignals == [])
+
+        for e in inputSignals:
+            self.inputSignal.add(e)
+
+        return self.exec_aux()
+
+    def exec_aux(self):
         # For efficiency, we use StringBuilder to make the entire script to execute in MATLAB rather than evaluate each line.
 
         # Make the input signal
@@ -286,6 +295,20 @@ class SUL:
         y = np.array(y[0], dtype=np.float64)
         t = np.array(t, dtype=np.float64)
 
+        ary = []
+        for i in range(len(y)):
+            a = np.insert(y[i], 0, t[i])
+            ary.append(list(a))
+
+        ret = np.array(ary, dtype=np.float64)
+        return ret.tolist()
+
+    def exec(self, inputSignals: List[List[float]]) -> np.ndarray:
+        (t, y) = self.simulinkModel.exec(inputSignals)
+        y = np.array(y[0], dtype=np.float64)
+        t = np.array(t, dtype=np.float64)
+
+        # Convert the result to numpy array
         ary = []
         for i in range(len(y)):
             a = np.insert(y[i], 0, t[i])
