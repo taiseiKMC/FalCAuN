@@ -41,6 +41,11 @@ public class PythonModel<I, O> {
     private PyCallable pyPre, pyPost, pyStep, pyClose;
     private Optional<PyCallable> pyExec = Optional.empty();
 
+    static {
+        // JepConfig must be set before creating any SharedInterpreters
+        SharedInterpreter.setConfig(new JepConfig().redirectStdout(System.out).redirectStdErr(System.err));
+    }
+
     /**
      * Constructs a Python interpreter with the given initialization script as a Python model.
      * The script should define a class SUL with methods pre(), post(), step(I inputSignal) -> O, and close().
@@ -52,7 +57,6 @@ public class PythonModel<I, O> {
     public PythonModel(String initScript, Class<O> outputClass) throws JepException {
         this.outputClass = outputClass;
         this.initScript = initScript;
-        SharedInterpreter.setConfig(new JepConfig().redirectStdout(System.out).redirectStdErr(System.err));
         initialize();
     }
 
@@ -106,6 +110,7 @@ public class PythonModel<I, O> {
 
     public void close() {
         this.pyClose.call();
+        this.interpreter.get().close();
     }
 
     public boolean hasExec() {
