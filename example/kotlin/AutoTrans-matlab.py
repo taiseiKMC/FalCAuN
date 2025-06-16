@@ -1,3 +1,7 @@
+import sys
+sys.path.append(".")
+
+from abstract_sul import AbstractSUL
 from typing import List, Callable, Tuple
 #from java.util import ArrayList
 import matlab.engine
@@ -259,7 +263,7 @@ class SimulinkModel:
         else:
             return self.eng.workspace["t"]
 
-class SUL:
+class SUL(AbstractSUL):
     """
     Python wrapped SUL using the Autotrans_shift Simulink model
     """
