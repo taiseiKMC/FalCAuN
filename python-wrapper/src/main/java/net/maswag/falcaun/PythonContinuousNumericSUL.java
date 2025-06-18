@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.automatalib.word.Word;
 import net.automatalib.word.WordBuilder;
 import jep.JepException;
-import jep.NDArray;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -16,6 +15,8 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeable {
@@ -28,7 +29,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
      * Use rawtypes because classobject does not support generic type
      */
     @SuppressWarnings("rawtypes")
-    protected final PythonModel<List<Double>, NDArray> model;
+    protected final PythonModel<List<Double>, List> model;
     protected Signal inputSignal = null;
     protected final TimeMeasure simulationTime = new TimeMeasure();
 
@@ -45,7 +46,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
     @SuppressWarnings("rawtypes")
     public PythonContinuousNumericSUL(String initScript, Double signalStep)
             throws InterruptedException, ExecutionException {
-        this.model = new PythonModel<List<Double>, NDArray>(initScript, NDArray.class);
+        this.model = new PythonModel<List<Double>, List>(initScript, List.class);
         this.signalStep = signalStep;
     }
 
@@ -91,28 +92,24 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
         this.model.post();
     }
 
-    public ValueWithTime<List<Double>> constructValueWithTime(@SuppressWarnings("rawtypes") NDArray ndArray) {
-        var dimension = ndArray.getDimensions();
-        assert dimension[1] == this.inputSignal.get(0).size() + 1; // +1 for the timestamp
-        var length = dimension[0];
-        var length2 = dimension[1];
-        var obj = ndArray.getData();
+    private ValueWithTime<List<Double>> constructValueWithTime(@SuppressWarnings("rawtypes") List list) {
+        // Convert the raw list to a typed list with runtime type checking
+        Stream<?> stream = list.stream();
+        List<List<Double>> data = stream.map(e1 -> {
+                Stream<?> s = List.class.cast(e1).stream();
+                return s.map(e2 -> Double.class.cast(e2)).collect(Collectors.toList());
+            }).collect(Collectors.toList());
 
-        if (obj instanceof double[] data) {
-            var timestamps = new ArrayList<Double>();
-            var result = new ArrayList<List<Double>>();
-            for (int i = 0; i < length; i++) {
-                timestamps.add(data[i * length2]);
-                var output = new ArrayList<Double>();
-                for (int j = 1; j < length2; j++) {
-                    output.add(data[i * length2 + j]);
-                }
-                result.add(output);
-            }
-            return new ValueWithTime<List<Double>>(timestamps, result);
-        } else {
-            throw new IllegalArgumentException("Unsupported data type: " + obj.getClass().getName());
+        var length1 = data.size();
+        var length2 = data.get(0).size();
+        assert length2 == this.inputSignal.get(0).size() + 1; // +1 for the timestamp
+        var timestamps = new ArrayList<Double>();
+        var result = new ArrayList<List<Double>>();
+        for (int i = 0; i < length1; i++) {
+            timestamps.add(data.get(i).get(0));
+            result.add(data.get(i).subList(1, length2));
         }
+        return new ValueWithTime<List<Double>>(timestamps, result);
     }
 
     /**
@@ -155,7 +152,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
         pre();
 
         @SuppressWarnings("rawtypes")
-        NDArray ret = null;
+        List ret = null;
 
         for (var e : inputSignal) {
             this.inputSignal.add(e);
