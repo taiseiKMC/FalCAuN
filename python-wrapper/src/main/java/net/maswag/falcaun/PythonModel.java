@@ -5,6 +5,7 @@ import jep.JepException;
 import jep.JepConfig;
 import jep.python.PyCallable;
 import jep.python.PyObject;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
@@ -40,6 +41,9 @@ public class PythonModel<I, O> {
 
     private PyCallable pyPre, pyPost, pyStep, pyClose;
     private Optional<PyCallable> pyExec = Optional.empty();
+
+    @Getter
+    private final TimeMeasure simulationTime = new TimeMeasure();
 
     static {
         // JepConfig must be set before creating any SharedInterpreters
@@ -103,9 +107,12 @@ public class PythonModel<I, O> {
      * For the given outputClass, it tries to convert the output object by python to O type by Jep.
      */
     public O step(I inputSignal) throws JepException {
+        simulationTime.start();
         //Type ty = getClass().getGenericSuperclass();
         //var clazz = ((Class<O>)((ParameterizedType)ty).getActualTypeArguments()[1]);
-        return this.pyStep.callAs(this.outputClass, inputSignal);
+        var ret = this.pyStep.callAs(this.outputClass, inputSignal);
+        simulationTime.stop();
+        return ret;
     }
 
     public void close() {
@@ -119,6 +126,9 @@ public class PythonModel<I, O> {
 
     @SuppressWarnings("rawtypes")
     public ArrayList exec(List<I> inputSignals) {
-        return this.pyExec.orElseThrow().callAs(ArrayList.class, inputSignals);
+        simulationTime.start();
+        var ret = this.pyExec.orElseThrow().callAs(ArrayList.class, inputSignals);
+        simulationTime.stop();
+        return ret;
     }
 }

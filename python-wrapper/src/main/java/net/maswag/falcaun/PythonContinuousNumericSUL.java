@@ -31,7 +31,6 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
     @SuppressWarnings("rawtypes")
     protected final PythonModel<List<Double>, ArrayList> model;
     protected Signal inputSignal = null;
-    protected final TimeMeasure simulationTime = new TimeMeasure();
 
     @Getter
     private int counter = 0;
@@ -70,7 +69,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
      */
     @Override
     public void clear() {
-        simulationTime.reset();
+        this.model.getSimulationTime().reset();
         counter = 0;
     }
 
@@ -131,9 +130,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
         }
         this.inputSignal.add(inputSignal);
 
-        simulationTime.start();
         var ret = this.model.step(inputSignal);
-        simulationTime.stop();
 
         var values = constructValueWithTime(ret);
         double endTime = getCurrentTime();
@@ -158,17 +155,11 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
         // Otherwise, use step() for each input signal.
         if(this.model.hasExec()) {
             this.inputSignal.addAll(inputSignal);
-
-            simulationTime.start();
             ret = this.model.exec(inputSignal.asList());
-            simulationTime.stop();
         } else {
             for (var e : inputSignal) {
                 this.inputSignal.add(e);
-
-                simulationTime.start();
                 ret = this.model.step(e);
-                simulationTime.stop();
             }
         }
 
@@ -202,7 +193,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
      * {@inheritDoc}
      */
     public double getSimulationTimeSecond() {
-        return this.simulationTime.getSecond();
+        return this.model.getSimulationTime().getSecond();
     }
 
 }

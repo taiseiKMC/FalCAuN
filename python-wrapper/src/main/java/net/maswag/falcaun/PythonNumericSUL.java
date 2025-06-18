@@ -24,7 +24,6 @@ public class PythonNumericSUL implements NumericSUL, Closeable {
     @SuppressWarnings("rawtypes")
     protected final PythonModel<List<Double>, ArrayList> model;
     protected ArrayList<List<Double>> outputSignals = new ArrayList<List<Double>>();
-    protected final TimeMeasure simulationTime = new TimeMeasure();
 
     @Getter
     private int counter = 0;
@@ -54,7 +53,7 @@ public class PythonNumericSUL implements NumericSUL, Closeable {
      */
     @Override
     public void clear() {
-        simulationTime.reset();
+        this.model.getSimulationTime().reset();
         counter = 0;
     }
 
@@ -85,10 +84,7 @@ public class PythonNumericSUL implements NumericSUL, Closeable {
             return null;
         }
 
-        simulationTime.start();
         var ret = this.model.step(inputSignal);
-        simulationTime.stop();
-
         Stream<?> stream = ret.stream();
         var outputSignal = stream.map(e -> Double.class.cast(e)).collect(Collectors.toList());
         this.outputSignals.add(outputSignal);
@@ -112,10 +108,7 @@ public class PythonNumericSUL implements NumericSUL, Closeable {
         // Use exec() if it is available in the model for batch processing.
         // Otherwise, use step() for each input signal.
         if (this.model.hasExec()) {
-            simulationTime.start();
             ret = this.model.exec(inputSignal.asList());
-            simulationTime.stop();
-
             Stream<?> stream = ret.stream();
             outputs = stream.map(e1 -> {
                 Stream<?> s = List.class.cast(e1).stream();
@@ -123,10 +116,7 @@ public class PythonNumericSUL implements NumericSUL, Closeable {
             }).collect(Collectors.toCollection(ArrayList::new));
         } else {
             for (var e : inputSignal) {
-                simulationTime.start();
                 ret = this.model.step(e);
-                simulationTime.stop();
-
                 Stream<?> stream = ret.stream();
                 var output = stream.map(obj -> Double.class.cast(obj)).collect(Collectors.toList());
                 outputs.add(output);
@@ -158,6 +148,6 @@ public class PythonNumericSUL implements NumericSUL, Closeable {
      * {@inheritDoc}
      */
     public double getSimulationTimeSecond() {
-        return this.simulationTime.getSecond();
+        return this.model.getSimulationTime().getSecond();
     }
 }
