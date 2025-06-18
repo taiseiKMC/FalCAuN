@@ -5,7 +5,6 @@ import jep.JepException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.automatalib.word.Word;
-import net.automatalib.word.WordBuilder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -110,19 +109,30 @@ public class PythonNumericSUL implements NumericSUL, Closeable {
         ArrayList<List<Double>> outputs = new ArrayList<List<Double>>();
         ArrayList<?> ret;
 
-        for (var e : inputSignal) {
+        // Use exec() if it is available in the model for batch processing.
+        // Otherwise, use step() for each input signal.
+        if (this.model.hasExec()) {
             simulationTime.start();
-            try {
-                ret = this.model.step(e);
-            } catch (JepException exc) {
-                throw new InterruptedException(exc.toString());
-            }
+            ret = this.model.exec(inputSignal.asList());
             simulationTime.stop();
 
             Stream<?> stream = ret.stream();
-            var output = stream.map(obj -> Double.class.cast(obj)).collect(Collectors.toList());
-            outputs.add(output);
+            outputs = stream.map(e1 -> {
+                Stream<?> s = List.class.cast(e1).stream();
+                return s.map(e2 -> Double.class.cast(e2)).collect(Collectors.toList());
+            }).collect(Collectors.toCollection(ArrayList::new));
+        } else {
+            for (var e : inputSignal) {
+                simulationTime.start();
+                ret = this.model.step(e);
+                simulationTime.stop();
+
+                Stream<?> stream = ret.stream();
+                var output = stream.map(obj -> Double.class.cast(obj)).collect(Collectors.toList());
+                outputs.add(output);
+            }
         }
+
         var outputSignal = Word.fromList(outputs);
         return new IODiscreteSignal<>(inputSignal, outputSignal);
     }
