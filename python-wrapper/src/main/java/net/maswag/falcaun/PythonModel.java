@@ -8,11 +8,14 @@ import jep.python.PyObject;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * A PythonModel class wraps a model implemented by python.
  * The model is expected to have methods pre(), post(), step(I inputSignal) -> O, and close().
+ * If the model has an exec(List<I> inputSignals) -> List<O> method,
+ * NumericSUL can be used to execute a batch of input signals for optimization.
  * This class uses Jep library to interact with Python.
  */
 @Slf4j
@@ -110,7 +113,7 @@ public class PythonModel<I, O> {
     }
 
     @SuppressWarnings("rawtypes")
-    public List exec(List<I> inputSignals) {
-        return this.pyExec.orElseThrow().callAs(List.class, inputSignals);
+    public ArrayList exec(List<I> inputSignals) {
+        return this.pyExec.orElseThrow().callAs(ArrayList.class, inputSignals);
     }
 }

@@ -29,7 +29,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
      * Use rawtypes because classobject does not support generic type
      */
     @SuppressWarnings("rawtypes")
-    protected final PythonModel<List<Double>, List> model;
+    protected final PythonModel<List<Double>, ArrayList> model;
     protected Signal inputSignal = null;
     protected final TimeMeasure simulationTime = new TimeMeasure();
 
@@ -46,7 +46,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
     @SuppressWarnings("rawtypes")
     public PythonContinuousNumericSUL(String initScript, Double signalStep)
             throws InterruptedException, ExecutionException {
-        this.model = new PythonModel<List<Double>, List>(initScript, List.class);
+        this.model = new PythonModel<List<Double>, ArrayList>(initScript, ArrayList.class);
         this.signalStep = signalStep;
     }
 
@@ -92,9 +92,9 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
         this.model.post();
     }
 
-    private ValueWithTime<List<Double>> constructValueWithTime(@SuppressWarnings("rawtypes") List list) {
+    private ValueWithTime<List<Double>> constructValueWithTime(@SuppressWarnings("rawtypes") ArrayList ary) {
         // Convert the raw list to a typed list with runtime type checking
-        Stream<?> stream = list.stream();
+        Stream<?> stream = ary.stream();
         List<List<Double>> data = stream.map(e1 -> {
                 Stream<?> s = List.class.cast(e1).stream();
                 return s.map(e2 -> Double.class.cast(e2)).collect(Collectors.toList());
@@ -152,7 +152,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
         pre();
 
         @SuppressWarnings("rawtypes")
-        List ret = null;
+        ArrayList ret = null;
 
         // Use exec() if it is available in the model for batch processing.
         // Otherwise, use step() for each input signal.
