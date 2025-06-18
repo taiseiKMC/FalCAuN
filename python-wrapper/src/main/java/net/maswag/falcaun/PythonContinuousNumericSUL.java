@@ -93,7 +93,7 @@ public class PythonContinuousNumericSUL implements ContinuousNumericSUL, Closeab
 
     public ValueWithTime<List<Double>> constructValueWithTime(@SuppressWarnings("rawtypes") NDArray ndArray) {
         var dimension = ndArray.getDimensions();
-        assert dimension[1] == inputSignal.size() + 1; // +1 for the timestamp
+        assert dimension[1] == this.inputSignal.get(0).size() + 1; // +1 for the timestamp
         var length = dimension[0];
         var length2 = dimension[1];
         var obj = ndArray.getData();
