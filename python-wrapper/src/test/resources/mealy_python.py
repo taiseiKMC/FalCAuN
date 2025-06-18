@@ -1,5 +1,5 @@
 from typing import Mapping, Tuple
-from enum import auto, Enum
+from enum import Enum
 
 #StrEnum is available since 3.11
 class State(Enum):
