@@ -4,7 +4,7 @@
 @file:DependsOn("net.maswag.falcaun:FalCAuN-core:1.0-SNAPSHOT", "net.maswag.falcaun:FalCAuN-python:1.0-SNAPSHOT")
 @file:KotlinOptions("-Djava.library.path=/home/sugina/.pyenv/versions/3.10.15/lib/python3.10/site-packages/jep")
 
-val python_file = "./mealy-python.py"
+val python_file = "./mealy_python.py"
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger

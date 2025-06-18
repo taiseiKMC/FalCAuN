@@ -1,7 +1,7 @@
 #!/usr/bin/env kscript
 
 var signalStep = 1.0
-val initScript = "./AutoTrans-matlab.py"
+val initScript = "./autotrans_matlab.py"
 
 // This script depends on FalCAuN-core and FalCAuN-python
 @file:DependsOn("net.maswag.falcaun:FalCAuN-core:1.0-SNAPSHOT", "net.maswag.falcaun:FalCAuN-python:1.0-SNAPSHOT")

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PythonSULTest {
-    static final String mealyScript = "./src/test/resources/mealy-python.py";
+    static final String mealyScript = "./src/test/resources/mealy_python.py";
 
     @Test
     void mealyTest() throws Exception {

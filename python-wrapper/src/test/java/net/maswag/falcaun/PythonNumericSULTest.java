@@ -14,7 +14,7 @@ class PythonNumericSULTest {
     // test-numeric-sul.py accumulates the sum of the input List<Double> and returns it.
     // The first output is truncated to 100.0 if it exceeds 100.0.
     // The second output is the sum modulo 100.0.
-    static final String numericScript = "./src/test/resources/test-numeric-sul.py";
+    static final String numericScript = "./src/test/resources/test_numeric_sul.py";
 
     @Test
     void numericStepTest() throws Exception {
