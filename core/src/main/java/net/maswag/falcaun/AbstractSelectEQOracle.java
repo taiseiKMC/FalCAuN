@@ -7,7 +7,7 @@ import de.learnlib.oracle.PropertyOracle;
 import de.learnlib.query.DefaultQuery;
 import lombok.Getter;
 import net.automatalib.automaton.transducer.MealyMachine;
-import net.automatalib.common.util.collection.CollectionsUtil;
+// import net.automatalib.common.util.collection.CollectionsUtil;
 import net.automatalib.word.Word;
 import net.automatalib.word.WordBuilder;
 import org.slf4j.Logger;
@@ -198,7 +198,7 @@ public abstract class AbstractSelectEQOracle implements EquivalenceOracle.MealyE
             return null;
         }
         int testSize = 0;
-        symbolList = CollectionsUtil.randomAccessList(inputs);
+        symbolList = inputs instanceof List && inputs instanceof RandomAccess ? (List<? extends String>)inputs : new ArrayList<String>(inputs);
 
         if (resetWord || currentSamples.isEmpty()) {
             resetSamples();

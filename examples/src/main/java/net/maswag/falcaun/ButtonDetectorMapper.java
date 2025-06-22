@@ -2,7 +2,7 @@ package net.maswag.falcaun;
 
 import de.learnlib.sul.SUL;
 import net.automatalib.alphabet.Alphabet;
-import net.automatalib.alphabet.ArrayAlphabet;
+import net.automatalib.alphabet.impl.ArrayAlphabet;
 
 /**
  * A mapper for ButtonDetector that converts between String and ButtonDetector types.
