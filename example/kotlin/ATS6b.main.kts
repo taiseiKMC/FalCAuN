@@ -23,6 +23,8 @@
  *
  ********/
 
+// Import the common utilities and constants
+@file:Import("./Common.kt")
 // Import the constants for AutoTrans
 @file:Import("./AutoTrans.kt")
 // This script depends on FalCAuN-core and FalCAuN-matlab
@@ -45,11 +47,9 @@ val ignoreValues = listOf(null)
 val gearValues = listOf(null)
 //val outputMapperReader = OutputMapperReader(listOf(velocityValues, accelerationValues, gearValues, velocityValues, accelerationValues))
 val outputMapperReader = OutputMapperReader(listOf(ignoreValues, ignoreValues, gearValues, velocityValues, accelerationValues))
-outputMapperReader.parse()
 val mapperString = listOf("previous_max_output(0)", "previous_max_output(1)").joinToString("\n")
 val signalMapper: ExtendedSignalMapper = ExtendedSignalMapper.parse(BufferedReader(StringReader(mapperString)))
-val mapper =
-    NumericSULMapper(inputMapper, outputMapperReader.largest, outputMapperReader.outputMapper, signalMapper)
+val mapper = NumericSULMapper(inputMapper, outputMapperReader, signalMapper)
 
 // Define the output signal names
 val velocity = "signal(0)"
@@ -61,27 +61,23 @@ val prevMaxVelocity = "output(3)"
 val prevMaxRotation = "output(4)"
 
 // Define the STL properties
-val stlFactory = STLFactory()
 signalStep = 1.0
 //val stlGRotationLt3000 = "$rotation < 3000.0 && []_[0, ${(30 / signalStep).toInt()}] ($prevMaxRotation < 3000.0)"
 val stlGRotationLt3000 = "[]_[0, ${(30 / signalStep).toInt()}] ($prevMaxRotation < 3000.0)"
 val stlNotGRotationLt3000 = "<>_[0, ${(30 / signalStep).toInt()}] ($prevMaxRotation > 3000.0)"
 //val STLGVelocityLt50 = "$velocity < 50.0 && []_[0,${(8 / signalStep).toInt()}] ($prevMaxVelocity < 50.0)"
 val STLGVelocityLt50 = "[]_[0,${(8 / signalStep).toInt()}] ($prevMaxVelocity < 50.0)"
-val stlList = listOf(
-    //"($stlGRotationLt3000) -> ($STLGVelocityLt35)",
-    // We use || instead of -> because specification strengthening does not support -> yet
-    // "(!($stlGRotationLt3000)) || ($STLGVelocityLt35)",
-    // Similarly, we use <>! instead of ![]
-    "($stlNotGRotationLt3000) || ($STLGVelocityLt50)",
-).stream().map { stlString ->
-    stlFactory.parse(
-        stlString,
-        inputMapper,
-        outputMapperReader.outputMapper,
-        outputMapperReader.largest
-    )
-}.toList()
+val stlList = parseStlList(
+    listOf(
+        //"($stlGRotationLt3000) -> ($STLGVelocityLt35)",
+        // We use || instead of -> because specification strengthening does not support -> yet
+        // "(!($stlGRotationLt3000)) || ($STLGVelocityLt35)",
+        // Similarly, we use <>! instead of ![]
+        "($stlNotGRotationLt3000) || ($STLGVelocityLt50)",
+    ),
+    inputMapper,
+    outputMapperReader
+)
 val signalLength = 30
 val properties = AdaptiveSTLList(stlList, signalLength)
 
@@ -103,26 +99,14 @@ SimulinkSUL(initScript, paramNames, signalStep, simulinkSimulationStep).use { au
     verifier.addGAEQOracleAll(
         signalLength,
         maxTest,
-        ArgParser.GASelectionKind.Tournament,
+        GASelectionKind.Tournament,
         populationSize,
         crossoverProb,
         mutationProb
     )
     val result = verifier.run()
 
-    // Print the result
-    if (result) {
-        println("The property is likely satisfied")
-    } else {
-        println("The property is falsified")
-        for (i in 0 until verifier.cexProperty.size) {
-            println("${verifier.cexProperty[i]} is falsified by the following counterexample)")
-            println("cex concrete input: ${verifier.cexConcreteInput[i]}")
-            println("cex abstract input: ${verifier.cexAbstractInput[i]}")
-            println("cex output: ${verifier.cexOutput[i]}")
-        }
-    }
-    println("Execution time for simulation: ${verifier.simulationTimeSecond} [sec]")
-    println("Number of simulations: ${verifier.simulinkCount}")
-    println("Number of simulations for equivalence testing: ${verifier.simulinkCountForEqTest}")
+    // Print the result and stats (shared helpers)
+    printResults(verifier, result)
+    printStats(verifier)
 }
