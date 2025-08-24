@@ -31,14 +31,14 @@ import java.util.List;
  *
  * <p>We use uniform crossover and random mutation.</p>
  */
-class GAEQOracle implements EquivalenceOracle.MealyEquivalenceOracle<String, String>,
+public class GAEQOracle implements EquivalenceOracle.MealyEquivalenceOracle<String, String>,
         EvaluationCountable.MealyEquivalenceOracle<String, String> {
     private final Algorithm<IntegerSolution> algorithm;
     private final EQSearchProblem problem;
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GAEQOracle.class);
     private final PropertyOracle.MealyPropertyOracle<String, String, String> ltlOracle;
 
-    GAEQOracle(NumericMembershipOracleCost memOracle, int length, int maxEvaluations, ArgParser.GASelectionKind selectionKind, int populationSize, double crossoverProb, double mutationProbability, PropertyOracle.MealyPropertyOracle<String, String, String> ltlOracle) {
+    GAEQOracle(NumericMembershipOracleCost memOracle, int length, int maxEvaluations, GASelectionKind selectionKind, int populationSize, double crossoverProb, double mutationProbability, PropertyOracle.MealyPropertyOracle<String, String, String> ltlOracle) {
 
         this.problem = new EQSearchProblem(memOracle, length);
         CrossoverOperator<IntegerSolution> crossoverOperator = new IntegerUniformCrossover(crossoverProb);

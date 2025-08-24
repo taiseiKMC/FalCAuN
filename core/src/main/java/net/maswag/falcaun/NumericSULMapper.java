@@ -66,14 +66,36 @@ public class NumericSULMapper implements SULMapper<String, String, List<Double>,
         concreteOutputs = new ArrayList<>();
 
         for (Map<Character, Double> entry : outputMapper) {
-            ArrayList<Character> cList = new ArrayList<>(entry.keySet());
-            ArrayList<Double> dList = new ArrayList<>(entry.values());
-            assert cList.size() == dList.size();
+            ArrayList<Character> cList = new ArrayList<>();
+            ArrayList<Double> dList = new ArrayList<>();
+
+            // Sort the entry by value and add keys and values to cList and dList in sorted order
+            entry.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue())
+                .forEachOrdered(e -> {
+                    cList.add(e.getKey());
+                    dList.add(e.getValue());
+                });
+
             abstractOutputs.add(cList);
             concreteOutputs.add(dList);
         }
         this.sigMap = sigMap;
         log.debug("sigMap size: {}", sigMap.size());
+    }
+
+    /**
+     * <p>Constructor for SimulinkSULMapper.</p>
+     *
+     * @param inputMapper        An input mapper.
+     * @param outputMapperReader The reader of output mapper.
+     * @param sigMap             An signal mapper.
+     */
+    public NumericSULMapper(List<Map<Character, Double>> inputMapper,
+                            OutputMapperReader outputMapperReader,
+                            SignalMapper sigMap) {
+        this(inputMapper, outputMapperReader.getLargest(), outputMapperReader.getOutputMapper(), sigMap);
     }
 
     /**
@@ -88,7 +110,7 @@ public class NumericSULMapper implements SULMapper<String, String, List<Double>,
         return Word.fromList(abstractInput.stream().map(this::mapInput).collect(Collectors.toList()));
     }
 
-    List<Word<List<Double>>> mapInputs(List<Word<String>> abstractInputs) {
+    public List<Word<List<Double>>> mapInputs(List<Word<String>> abstractInputs) {
         return abstractInputs.stream().map(
                 word -> (word == null) ? null : Word.fromList(word.stream().map(this::mapInput).collect(Collectors.toList()))
         ).collect(Collectors.toList());
@@ -131,11 +153,11 @@ public class NumericSULMapper implements SULMapper<String, String, List<Double>,
         return result;
     }
 
-    Alphabet<String> constructAbstractAlphabet() {
+    public Alphabet<String> constructAbstractAlphabet() {
         return new GrowingMapAlphabet<>(this.inputMapper.keySet());
     }
 
-    Alphabet<List<Double>> constructConcreteAlphabet() {
+    public Alphabet<List<Double>> constructConcreteAlphabet() {
         return new GrowingMapAlphabet<>(this.inputMapper.values());
     }
 }
